@@ -1,28 +1,193 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="form__group field">
+      <input
+        type="input"
+        class="form__field"
+        placeholder="Name"
+        id="name"
+        required
+        @keypress.enter.prevent="linkshort"
+      />
+      <label for="name" class="form__label">
+        Insert a link and press enter
+      </label>
+    </div>
+    <div class="links">
+      <div class="link" v-show="link">
+        <p>{{ link }}</p>
+
+        <button v-clipboard:copy="link">
+          <img src="../public/copy.png" />
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import axios from "axios";
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  name: "App",
+
+  data() {
+    return {
+      error: false,
+      link: "",
+      apiKey: "9a01aa8495b78f86dfa2d3eab9138d80b36dd6f9",
+    };
+  },
+  methods: {
+    async linkshort(event) {
+      let response = await axios.post(
+        "https://api-ssl.bitly.com/v4/shorten",
+        {
+          long_url: event.target.value,
+        },
+        {
+          headers: {
+            Authorization: "8cf9c46fd334fe246e876380fa62928f87525292",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data.link);
+      this.link = response.data.link;
+    },
+  },
+};
 </script>
 
 <style lang="scss">
+body {
+  font-family: "Poppins", sans-serif;
+  height: 100vh;
+  font-size: 1.5rem;
+  background-color: #222;
+  overflow: hidden;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.form__group {
+  position: relative;
+  padding: 15px 0 0;
+  margin-top: 10px;
+  width: 500px;
+}
+
+.form__field {
+  font-family: inherit;
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: #fff;
+  padding: 7px 0;
+  background: transparent;
+  transition: all 0.7s;
+}
+
+.form__field::placeholder {
+  color: transparent;
+}
+
+.form__field:placeholder-shown ~ .form__label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+
+.form__field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, #11998e, #38ef7d);
+  border-image-slice: 1;
+}
+
+.form__field:focus ~ .form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #11998e;
+  font-weight: 700;
+}
+
+/* reset input */
+
+.form__field:required,
+.form__field:invalid {
+  box-shadow: none;
+}
+
+.links {
+  width: 800px;
+  color: #9b9b9b;
+  transition: all 0.8s;
+  margin-top: 20px;
+  font-size: 0.8em;
+}
+
+.link {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  background-color: antiquewhite;
+  border-radius: 10px;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.link p {
+  margin-left: 20px;
+}
+
+.link button {
+  border: none;
+  outline: none;
+  font-size: 1em;
+  padding: 0 30px;
+  background: transparent;
+  transition: 0.2s;
+}
+
+.link button:active {
+  color: rgb(194, 194, 194);
+  font-size: 1.5em;
+}
+
+.error {
+  width: 500px;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  padding: 10px;
+  background-color: rgb(196, 37, 37);
+  border-radius: 20px;
+  color: #fff;
+  margin: 10px 0;
+  transition: all 0.8s;
+}
+
+.errorinput {
+  border-bottom: rgb(196, 37, 37);
+  transition: all 0.8s;
 }
 </style>
